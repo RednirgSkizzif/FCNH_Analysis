@@ -46,6 +46,8 @@ TH1D* M_eta = new TH1D("M_eta","Invariant Mass of smallest eta",35,0,300);
 TH1D* leading_lepton = new TH1D("leading_lepton","Leading Lepton PT",35,0,300);
 TH1D* tau_hadron_PT = new TH1D("tau_hadron_PT","Hadron from tau Pt",30,0,300);
 TH1D* higgs_leptonic = new TH1D("higgs_leptonic","Higgs invariant mass from e+mu opposite sign",30,0,300);
+TH1D* higgs_hadronic = new TH1D("higgs_hadronic","Higgs mass from 2 hadronic taus",30,0,300);
+int acceptance_hadronic=0;
 int acceptance_lep=0;
 int acceptance=0;
 double M_b12_accuracy=0;
@@ -116,7 +118,7 @@ int numTauJets=0;
 					v_tau1.SetPtEtaPhiM(Jet_PT[i],Jet_Eta[i],Jet_Phi[i],Jet_Mass[i]);
 				numTauJets++;
 					}
-			 if(numTauJets==1 && Jet_TauTag[i]==1){
+			 else if(numTauJets==1 && Jet_TauTag[i]==1){
                        		v_tau2.SetPtEtaPhiM(Jet_PT[i],Jet_Eta[i],Jet_Phi[i],Jet_Mass[i]);
                         	numTauJets++;
                                         }		
@@ -205,6 +207,38 @@ higgs->Fill(v_higgs.M());
 if(v_higgs.M()>105 && v_higgs.M()<145)
 acceptance++;
 }
+//Here begins the fully hadronic tau reconstruction
+if(v_tau1.Pt()>2 && MissingET_MET[0]>2 && v_tau2.Pt()>2){
+cout << "entered if" << endl;
+cout << v_tau1.Pt() << " < tau pt's > " << v_tau2.Pt() << endl;
+v_missing.SetPtEtaPhiM(MissingET_MET[0],0,MissingET_Phi[0],0);
+double theta_l=TMath::ASin(v_tau2.Py()/v_tau2.Pt());
+double theta_h=TMath::ASin(v_tau1.Py()/v_tau1.Pt());
+double theta_m=TMath::ASin(v_missing.Py()/v_missing.Pt());
+
+cout << theta_l <<" < theta_l and theta_h > " << theta_h << endl;
+cout << theta_m<<endl;
+
+double xl=(v_tau2.Pt()*sin(theta_h-theta_l))/(v_tau2.Pt()*sin(theta_h-theta_l)+v_missing.Pt()*sin(theta_h-theta_m));
+double xh=(v_tau1.Pt()*sin(theta_h-theta_l))/(v_tau1.Pt()*sin(theta_h-theta_l)-v_missing.Pt()*sin(theta_l-theta_m));
+cout << "xl = " << xl << " , xh = " << xh <<endl;
+
+cout << "math done"<<endl;
+TLorentzVector v_had2_scaled;
+TLorentzVector v_had_scaled;
+TLorentzVector v_higgs;
+cout <<"point 1"<<endl;
+v_had2_scaled = v_tau2*(1/xl);
+v_had_scaled = v_tau1*(1/xh);
+cout<<"point 2"<<endl;
+v_higgs = v_had2_scaled+v_had_scaled;
+cout<<"scales done"<<endl;
+higgs_hadronic->Fill(v_higgs.M());
+
+if(v_higgs.M()>105 && v_higgs.M()<145)
+acceptance_hadronic++;
+cout << "exit if"<<endl;
+}
 //------------------------------------------------------------------------
 //The below is for e+mu opposite sign
 if(v_electron.Pt()>2 && MissingET_MET[0]>2 && v_muon.Pt()>2){
@@ -287,7 +321,8 @@ TCanvas* c4 = new TCanvas("c4","c4",800,800);
 higgs->Draw("e");
 TCanvas* c5 = new TCanvas("c5","c5",800,800);
 higgs_leptonic->Draw("e");
-
+TCanvas* c6 = new TCanvas("c6","c6",800,800);
+higgs_hadronic->Draw("e");
 cout << "M_b12_accuracy = " << M_b12_accuracy << endl;
 cout << "M_b13_accuracy = " << M_b13_accuracy << endl;
 cout << "M_b23_accuracy = " << M_b23_accuracy << endl;
