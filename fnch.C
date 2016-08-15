@@ -199,10 +199,11 @@ leading_lepton->Fill(Electron_PT[0]);
 v_lep.SetPtEtaPhiM(Electron_PT[0],Electron_Eta[0],Electron_Phi[0],0);
 }
 else
-//cout << "NO LL" <<endl;
+cout << "NO LL" <<endl;
 
 //This will be the computational part
-//
+//cout << v_tau1.Pt() <<" "<<v_lep.Pt()<<endl;
+
 if(v_tau1.Pt()>2 && MissingET_MET[0]>2 && v_lep.Pt()>2){
 v_missing.SetPtEtaPhiM(MissingET_MET[0],0,MissingET_Phi[0],0);
 double theta_l=TMath::ASin(v_lep.Py()/v_lep.Pt());
