@@ -2,3 +2,6 @@
 tag*
 events*
 unweighted*
+*.aux
+*.gz
+*.log
