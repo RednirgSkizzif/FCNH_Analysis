@@ -52,6 +52,9 @@ TH1D* higgs_muon = new TH1D("higgs_muon","Higgs from 2 muons",30,0,300);
 int acceptance_hadronic=0;
 int acceptance_lep=0;
 int acceptance=0;
+int acceptance_electron=0;
+int acceptance_muon=0;
+int events=0;
 double M_b12_accuracy=0;
 double M_b13_accuracy=0;
 double M_b23_accuracy=0;
@@ -196,7 +199,7 @@ leading_lepton->Fill(Electron_PT[0]);
 v_lep.SetPtEtaPhiM(Electron_PT[0],Electron_Eta[0],Electron_Phi[0],0);
 }
 else
-cout << "NO LL" <<endl;
+//cout << "NO LL" <<endl;
 
 //This will be the computational part
 //
@@ -221,7 +224,7 @@ v_higgs = v_lep_scaled+v_had_scaled;
 
 higgs->Fill(v_higgs.M());
 
-if(v_higgs.M()>105 && v_higgs.M()<145)
+if(v_higgs.M()>110 && v_higgs.M()<140)
 acceptance++;
 }
 //Here begins the fully hadronic tau reconstruction
@@ -250,9 +253,9 @@ v_higgs = v_had2_scaled+v_had_scaled;
 
 higgs_hadronic->Fill(v_higgs.M());
 
-if(v_higgs.M()>105 && v_higgs.M()<145)
+if(v_higgs.M()>110 && v_higgs.M()<140)
 acceptance_hadronic++;
-cout << "exit if"<<endl;
+//cout << "exit if"<<endl;
 }
 if(v_e1.Pt()>2 && MissingET_MET[0]>2 && v_e2.Pt()>2){
 v_missing.SetPtEtaPhiM(MissingET_MET[0],0,MissingET_Phi[0],0);
@@ -274,6 +277,8 @@ v_had_scaled = v_e2*(1/xh);
 v_higgs = v_lep_scaled+v_had_scaled;
 
 higgs_electron->Fill(v_higgs.M());
+    if(v_higgs.M()>110 && v_higgs.M()<140)
+    acceptance_electron++;
 
 }
 if(v_m1.Pt()>2 && MissingET_MET[0]>2 && v_m2.Pt()>2){
@@ -296,6 +301,8 @@ v_had_scaled = v_m2*(1/xh);
 v_higgs = v_lep_scaled+v_had_scaled;
 
 higgs_muon->Fill(v_higgs.M());
+    if(v_higgs.M()>110 && v_higgs.M()<140)
+    acceptance_muon++;
 
 }
 //------------------------------------------------------------------------
@@ -360,6 +367,7 @@ tau_hadron_PT->Fill(v_tau1.Pt());
 
 //if(numLightJets==2)
 //w_from_jets->Fill(v_w.M());
+       events++;
 //if (jentry>5000)
 //break;
 
@@ -390,6 +398,9 @@ cout << "M_b12_accuracy = " << M_b12_accuracy << endl;
 cout << "M_b13_accuracy = " << M_b13_accuracy << endl;
 cout << "M_b23_accuracy = " << M_b23_accuracy << endl;
 cout << "M_eta_accuracy = " << M_eta_accuracy << endl;
-cout << "total events that are in higgs window = " << acceptance <<endl;
-cout << "total events that are in higgs_leptonic window = " << acceptance_lep << endl;
+cout << "total events that are in lep/had higgs window = " << acceptance <<endl << (float)(acceptance)/(float)(events) << " = Acceptance"<<endl;
+cout << "total events that are in hadronic higgs window = " << acceptance_hadronic <<endl << (float)(acceptance_hadronic)/(float)(events) << " = Acceptance"<<endl;
+cout << "total events that are in emu+- higgs window = " << acceptance_lep << endl<< (float)(acceptance_lep)/(float)(events) << " = Acceptance"<<endl;
+cout << "total events that are in electron higgs window = " << acceptance_electron << endl<< (float)(acceptance_electron)/(float)(events) << " = Acceptance"<<endl;
+cout << "total events that are in muon higgs window = " << acceptance_muon << endl<< (float)(acceptance_muon)/(float)(events) << " = Acceptance"<<endl;
 }
