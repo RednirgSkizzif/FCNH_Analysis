@@ -383,7 +383,7 @@ M_b13->Draw("e");
 TCanvas* c3 = new TCanvas("c3","c3",800,800);
 //tau_hadron_PT->Draw("e");
 M_b23->Draw("e");
-TCanvas* c6 = new TCanvas("c6","c6",800,800);
+TCanvas* ce = new TCanvas("ce","ce",800,800);
 M_eta->Draw("e");
 TCanvas* c4 = new TCanvas("c4","c4",800,800);
 higgs->Draw("e");
