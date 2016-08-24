@@ -1,14 +1,14 @@
-#define fnch_cxx
-#include "fnch.h"
+#define analysis_cxx
+#include "analysis.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
 
-void fnch::Loop()
+void analysis::Loop()
 {
 //   In a ROOT session, you can do:
-//      Root > .L fnch.C
-//      Root > fnch t
+//      Root > .L analysis.C
+//      Root > analysis t
 //      Root > t.GetEntry(12); // Fill t data members with entry number 12
 //      Root > t.Show();       // Show values of entry 12
 //      Root > t.Show(16);     // Read and show values of entry 16
@@ -32,34 +32,46 @@ void fnch::Loop()
    if (fChain == 0) return;
 
    Long64_t nentries = fChain->GetEntriesFast();
-
+double xs = 15.618;
 TH1D* top_hadronic = new TH1D("top_from_jets","Top Quark from Jets Mass",50,0,300);
 TH1D* w_from_jets = new TH1D("w_from_jets","W Boson from Jets Mass",50,0,200); 
 TH1D* higgs = new TH1D("higgs","Higgs lep/had invariant mass",50,0,250);
 TH1D* electrons = new TH1D("electrons","Leading electrons",30,0,200);
 TH1D* leading_electron = new TH1D("leading_electron","Leading electron",30,0,200);
+TH1D* leading_muon = new TH1D("leading_muon","leading muon",30,0,200);
 TH1D* missingET = new TH1D("misingET","Missing Energy",30,0,200);
-TH1D* M_b12 = new TH1D("M_b12","Invariant Mass of b+1+2 Jets",35,0,300); 
-TH1D* M_b13 = new TH1D("M_b13","Invariant Mass of b+1+3 Jets",35,0,300); 
-TH1D* M_b23 = new TH1D("M_23","Invariant Mass of b+2+3 Jets",35,0,300); 
-TH1D* M_eta = new TH1D("M_eta","Invariant Mass of smallest eta",35,0,300);
+TH1D* M_b12 = new TH1D("M_b12","Invariant Mass of b+1+2 Jets",45,0,300); 
+TH1D* M_b13 = new TH1D("M_b13","Invariant Mass of b+1+3 Jets",45,0,300); 
+TH1D* M_b23 = new TH1D("M_23","Invariant Mass of b+2+3 Jets",45,0,300); 
+TH1D* M_eta = new TH1D("M_eta","Invariant Mass of smallest eta",45,0,300);
 TH1D* leading_lepton = new TH1D("leading_lepton","Leading Lepton PT",35,0,300);
 TH1D* tau_hadron_PT = new TH1D("tau_hadron_PT","Hadron from tau Pt",30,0,300);
 TH1D* higgs_leptonic = new TH1D("higgs_leptonic","Higgs invariant mass from e+mu opposite sign",30,0,300);
 TH1D* higgs_hadronic = new TH1D("higgs_hadronic","Higgs mass from 2 hadronic taus",30,0,300);
 TH1D* higgs_electron = new TH1D("higgs_electron","Higgs mass form 2 electrons",30,0,300);
 TH1D* higgs_muon = new TH1D("higgs_muon","Higgs from 2 muons",30,0,300);
+TH1D* Jet1_Pt = new TH1D("Jet1_Pt","Jet1 Pt",35,0,300);
+TH1D* Jet2_Pt = new TH1D("Jet2_Pt","Jet2 Pt",35,0,300);
+TH1D* Jet3_Pt = new TH1D("Jet3_Pt","Jet3 Pt",35,0,300);
+TH1D* Jet4_Pt = new TH1D("Jet4_Pt","Jet4 Pt",35,0,300);
+TH1D* M_12_postSelection = new TH1D("M_12_postSelection","Invariant Mass of j1+j2",45,0,300);
+TH1D* M_b12_postSelection = new TH1D("M_b12_postSelection","Invariant Mass of b+j1+j2",45,0,300);
+TH1D* M_3emu_postSelection = new TH1D("M_3h_postSelection","Invariant Mass of j3+tau+tau",45,0,300);
+TH1D* M_12_col = new TH1D("M_12_col","Invariant mass of jets near b jet",45,0,300);
+
 int acceptance_hadronic=0;
 int acceptance_lep=0;
 int acceptance=0;
 int acceptance_electron=0;
 int acceptance_muon=0;
 int events=0;
+int count=0;
 double M_b12_accuracy=0;
 double M_b13_accuracy=0;
 double M_b23_accuracy=0;
 double M_eta_accuracy=0;
 static double top_mass = 173.2;
+static double w_mass=80.0;
  Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
@@ -88,6 +100,12 @@ TLorentzVector v_m1;
 TLorentzVector v_m2;
 TLorentzVector v_e1;
 TLorentzVector v_e2;
+TLorentzVector v_M_12;
+TLorentzVector v_M_13;
+TLorentzVector v_M_23;
+TLorentzVector v_M_12_postSelection;
+TLorentzVector v_M_b12_postSelection;
+TLorentzVector v_M_3h_postSelection;
 
 int numbJets=0;
 int numLightJets=0;
@@ -137,21 +155,40 @@ int numTauJets=0;
 		double  delta_eta_b12 = fabs(v_bJet.Eta()-v_j1.Eta())+fabs(v_bJet.Eta()-v_j2.Eta());
 		double  delta_eta_b13 = fabs(v_bJet.Eta()-v_j1.Eta())+fabs(v_bJet.Eta()-v_j3.Eta());
 		double  delta_eta_b23 = fabs(v_bJet.Eta()-v_j2.Eta())+fabs(v_bJet.Eta()-v_j3.Eta());
+		
+		double dRb1 = sqrt((v_bJet.Phi()-v_j1.Phi())*(v_bJet.Phi()-v_j1.Phi())+(v_bJet.Eta()-v_j1.Eta())*(v_bJet.Eta()-v_j1.Eta()));
+		double dRb2 = sqrt((v_bJet.Phi()-v_j2.Phi())*(v_bJet.Phi()-v_j2.Phi())+(v_bJet.Eta()-v_j2.Eta())*(v_bJet.Eta()-v_j2.Eta()));
+		double dRb3 = sqrt((v_bJet.Phi()-v_j3.Phi())*(v_bJet.Phi()-v_j3.Phi())+(v_bJet.Eta()-v_j3.Eta())*(v_bJet.Eta()-v_j3.Eta()));
 		//cout<<"debug!"<<endl;
-		if(delta_eta_b12 < delta_eta_b13 && delta_eta_b12 < delta_eta_b23){
+		//int etaFill=0;
+		if(dRb1 < dRb3 && dRb2 < dRb3){
 			v_M_eta=v_bJet+v_j1+v_j2;
+			M_12_col->Fill((v_j2+v_j2).M());
+			//cout << etaFill<<endl;
+			//etaFill++;
 		}
-		  if(delta_eta_b13 < delta_eta_b12 && delta_eta_b13 < delta_eta_b23){
+		  if(dRb1 < dRb2 && dRb3 < dRb2){
                         v_M_eta=v_bJet+v_j1+v_j3;
+			M_12_col->Fill((v_j1+v_j3).M());
+			//cout << etaFill<<endl;
+			//etaFill++;
                 }
-		  if(delta_eta_b23 < delta_eta_b12 && delta_eta_b23 < delta_eta_b13){
+		  if(dRb2 < dRb1 && dRb3 < dRb1){
                         v_M_eta=v_bJet+v_j2+v_j3;
+			M_12_col->Fill((v_j2+v_j3).M());
+			//cout << etaFill<<endl;
+			//etaFill++;
                 }
 
 
 		v_M_b12 = v_bJet+v_j1+v_j2;
 		v_M_b13 = v_bJet+v_j1+v_j3;
 		v_M_b23 = v_bJet+v_j2+v_j3;
+		v_M_12 = v_j1 + v_j2;
+		v_M_13 = v_j1 + v_j3;
+		v_M_23 = v_j2 + v_j3;
+
+
 //cout << " Masses " << v_M_b12.M() << " " << v_M_b13.M() <<" "<< v_M_b23.M() << endl;
 //cout << numTauJets << endl;
 
@@ -201,9 +238,74 @@ v_lep.SetPtEtaPhiM(Electron_PT[0],Electron_Eta[0],Electron_Phi[0],0);
 else
 cout << "NO LL" <<endl;
 
-//This will be the computational part
-//cout << v_tau1.Pt() <<" "<<v_lep.Pt()<<endl;
 
+M_b12->Fill(v_M_b12.M());
+M_b13->Fill(v_M_b13.M());
+M_b23->Fill(v_M_b23.M());
+M_eta->Fill(v_M_eta.M());
+
+
+electrons->Fill(v_electronSum.M());
+missingET->Fill(MissingET_MET[0]);
+if(v_tau1.Pt()>2.0)
+tau_hadron_PT->Fill(v_tau1.Pt());
+
+
+//v_top_from_jets = v_bJet+v_j1+v_j2;
+//v_w = v_j1+v_j2;
+//if(numbJets==1 && numLightJets==2)
+//top_hadronic->Fill(v_top_from_jets.M());
+
+//if(numLightJets==2)
+//w_from_jets->Fill(v_w.M());
+ 
+Jet1_Pt->Fill(Jet_PT[0]);
+Jet2_Pt->Fill(Jet_PT[1]);
+Jet3_Pt->Fill(Jet_PT[2]);
+Jet4_Pt->Fill(Jet_PT[3]);
+
+if(Electron_size>0)
+{
+leading_electron->Fill(Electron_PT[0]);
+//cout << count <<endl;
+//count++;
+}
+if(Muon_size>0)
+{
+leading_muon->Fill(Muon_PT[0]);
+//cout << count <<endl;
+//count++;
+}
+
+
+double DM12 = fabs(v_M_b12.M()-top_mass)+fabs(v_M_12.M()-w_mass);
+double DM13 = fabs(v_M_b13.M()-top_mass)+fabs(v_M_13.M()-w_mass);
+double DM23 = fabs(v_M_b23.M()-top_mass)+fabs(v_M_23.M()-w_mass);
+
+M_b12_accuracy = M_b12_accuracy + DM12;
+M_b13_accuracy = M_b13_accuracy + DM13;
+M_b23_accuracy = M_b23_accuracy + DM23;
+M_eta_accuracy = M_eta_accuracy + fabs(v_M_eta.M()-top_mass);
+TLorentzVector v_swap;
+
+if(DM13 < DM12)
+{
+	v_swap = v_j3;
+	v_j3 = v_j2;
+	v_j2 = v_swap;
+}
+if(DM23 < DM12)
+{
+	v_swap = v_j1;
+	v_j1 = v_j3;
+	v_j3 = v_swap;
+}
+
+M_12_postSelection->Fill((v_j1+v_j2).M());
+M_b12_postSelection->Fill((v_bJet+v_j1+v_j2).M());
+
+//This will be the computational part
+//First is the lep/had decay mode
 if(v_tau1.Pt()>2 && MissingET_MET[0]>2 && v_lep.Pt()>2){
 v_missing.SetPtEtaPhiM(MissingET_MET[0],0,MissingET_Phi[0],0);
 double theta_l=TMath::ASin(v_lep.Py()/v_lep.Pt());
@@ -258,6 +360,7 @@ if(v_higgs.M()>110 && v_higgs.M()<140)
 acceptance_hadronic++;
 //cout << "exit if"<<endl;
 }
+//This begins the 2 electron channel
 if(v_e1.Pt()>2 && MissingET_MET[0]>2 && v_e2.Pt()>2){
 v_missing.SetPtEtaPhiM(MissingET_MET[0],0,MissingET_Phi[0],0);
 double theta_l=TMath::ASin(v_e1.Py()/v_e1.Pt());
@@ -282,6 +385,7 @@ higgs_electron->Fill(v_higgs.M());
     acceptance_electron++;
 
 }
+//This begins the 2 muon channel
 if(v_m1.Pt()>2 && MissingET_MET[0]>2 && v_m2.Pt()>2){
 v_missing.SetPtEtaPhiM(MissingET_MET[0],0,MissingET_Phi[0],0);
 double theta_l=TMath::ASin(v_m1.Py()/v_m1.Pt());
@@ -329,15 +433,8 @@ v_higgs = v_electron_scaled+v_muon_scaled;
 
 higgs_leptonic->Fill(v_higgs.M());
 
+M_3emu_postSelection->Fill((v_higgs+v_j3).M());
 
-M_b12->Fill(v_M_b12.M());
-M_b13->Fill(v_M_b13.M());
-M_b23->Fill(v_M_b23.M());
-M_eta->Fill(v_M_eta.M());
-M_b12_accuracy = M_b12_accuracy + fabs(v_M_b12.M()-top_mass);
-M_b13_accuracy = M_b13_accuracy + fabs(v_M_b13.M()-top_mass);
-M_b23_accuracy = M_b23_accuracy + fabs(v_M_b23.M()-top_mass);
-M_eta_accuracy = M_eta_accuracy + fabs(v_M_eta.M()-top_mass);
 
 
 
@@ -346,55 +443,73 @@ acceptance_lep++;
 }
 //Ends the Compuations
 //
-
-electrons->Fill(v_electronSum.M());
-missingET->Fill(MissingET_MET[0]);
-if(v_tau1.Pt()>2.0)
-tau_hadron_PT->Fill(v_tau1.Pt());
-
-//M_b12->Fill(v_M_b12.M());
-//M_b13->Fill(v_M_b13.M());
-//M_b23->Fill(v_M_b23.M());
-//M_eta->Fill(v_M_eta.M());
-//M_b12_accuracy = M_b12_accuracy + fabs(v_M_b12.M()-top_mass);
-//M_b13_accuracy = M_b13_accuracy + fabs(v_M_b13.M()-top_mass);
-//M_b23_accuracy = M_b23_accuracy + fabs(v_M_b23.M()-top_mass);
-//M_eta_accuracy = M_eta_accuracy + fabs(v_M_eta.M()-top_mass);
-
-//v_top_from_jets = v_bJet+v_j1+v_j2;
-//v_w = v_j1+v_j2;
-//if(numbJets==1 && numLightJets==2)
-//top_hadronic->Fill(v_top_from_jets.M());
-
-//if(numLightJets==2)
-//w_from_jets->Fill(v_w.M());
-       events++;
+      events++;
 //if (jentry>5000)
 //break;
+if(jentry % 100 == 0 )
+cout << jentry << " events completed" <<endl;
+
+
+
 
   }//Event Loop
 
-TCanvas* c1 = new TCanvas("c1","c1",800,800);
+Jet1_Pt->Scale(xs/Jet1_Pt->GetEntries());
+Jet2_Pt->Scale(xs/Jet2_Pt->GetEntries());
+Jet3_Pt->Scale(xs/Jet3_Pt->GetEntries());
+Jet4_Pt->Scale(xs/Jet4_Pt->GetEntries());
+leading_electron->Scale(xs/leading_electron->GetEntries());
+leading_muon->Scale(xs/leading_muon->GetEntries());
+missingET->Scale(xs/missingET->GetEntries());
+M_12_postSelection->Scale(xs/M_12_postSelection->GetEntries());
+M_b12_postSelection->Scale(xs/M_b12_postSelection->GetEntries());
+M_3emu_postSelection->Scale(xs/M_3emu_postSelection->GetEntries());
+M_12_col->Scale(xs/M_12_col->GetEntries());
+
+TFile* output = new TFile("Analysis_histograms_ver4.root","RECREATE");
+output->cd();
+//TCanvas* c1 = new TCanvas("c1","c1",800,800);
 //leading_lepton->Draw("e");
-M_b12->Draw("e");
-TCanvas* c2 = new TCanvas("c2","c2",800,800);
-//missingET->Draw("e");
-M_b13->Draw("e");
-TCanvas* c3 = new TCanvas("c3","c3",800,800);
+M_b12->Scale(xs/M_b12->GetEntries());
+M_b12->Write("M_b12");
+
+//TCanvas* c2 = new TCanvas("c2","c2",800,800);
+M_b13->Scale(xs/M_b13->GetEntries());
+M_b13->Write("M_b13");
+//TCanvas* c3 = new TCanvas("c3","c3",800,800);
 //tau_hadron_PT->Draw("e");
-M_b23->Draw("e");
-TCanvas* ce = new TCanvas("ce","ce",800,800);
-M_eta->Draw("e");
-TCanvas* c4 = new TCanvas("c4","c4",800,800);
-higgs->Draw("e");
-TCanvas* c5 = new TCanvas("c5","c5",800,800);
-higgs_leptonic->Draw("e");
-TCanvas* c6 = new TCanvas("c6","c6",800,800);
-higgs_hadronic->Draw("e");
-TCanvas* c7 = new TCanvas("c7","c7",800,800);
-higgs_electron->Draw("e");
-TCanvas* c8 = new TCanvas("c8","c8",800,800);
-higgs_muon->Draw("e");
+M_b23->Scale(xs/M_b23->GetEntries());
+M_b23->Write("M_b23");
+//TCanvas* ce = new TCanvas("ce","ce",800,800);
+M_eta->Scale(xs/M_eta->GetEntries());
+M_eta->Write("M_eta");
+M_12_col->Write("M_12_col");
+M_12_postSelection->Write("M_12_postSelection");
+M_b12_postSelection->Write("M_b12_postSelection");
+M_3emu_postSelection->Write("M_3emu_postSelection");
+
+//TCanvas* c4 = new TCanvas("c4","c4",800,800);
+higgs->Scale(xs/higgs->GetEntries());
+higgs->Write("higgs_from_l/h");
+//TCanvas* c5 = new TCanvas("c5","c5",800,800);
+higgs_leptonic->Scale(xs/higgs_leptonic->GetEntries());
+higgs_leptonic->Write("higgs_leptonic");
+//TCanvas* c6 = new TCanvas("c6","c6",800,800);
+higgs_hadronic->Scale(xs/higgs_hadronic->GetEntries());
+higgs_hadronic->Write("higgs_hadronic");
+//TCanvas* c7 = new TCanvas("c7","c7",800,800);
+higgs_electron->Scale(xs/higgs_electron->GetEntries());
+higgs_electron->Write("higgs_electron");
+//TCanvas* c8 = new TCanvas("c8","c8",800,800);
+higgs_muon->Scale(xs/higgs_muon->GetEntries());
+higgs_muon->Write("higgs_muonic");
+Jet1_Pt->Write("Jet1 Pt");
+Jet2_Pt->Write("Jet2 Pt");
+Jet3_Pt->Write("Jet3 Pt");
+Jet4_Pt->Write("Jet4 Pt");
+leading_electron->Write("Leading Electron Pt");
+leading_muon->Write("Leading Muon Pt");
+missingET->Write("Missing Et");
 cout << "M_b12_accuracy = " << M_b12_accuracy << endl;
 cout << "M_b13_accuracy = " << M_b13_accuracy << endl;
 cout << "M_b23_accuracy = " << M_b23_accuracy << endl;
@@ -404,4 +519,5 @@ cout << "total events that are in hadronic higgs window = " << acceptance_hadron
 cout << "total events that are in emu+- higgs window = " << acceptance_lep << endl<< (float)(acceptance_lep)/(float)(events) << " = Acceptance"<<endl;
 cout << "total events that are in electron higgs window = " << acceptance_electron << endl<< (float)(acceptance_electron)/(float)(events) << " = Acceptance"<<endl;
 cout << "total events that are in muon higgs window = " << acceptance_muon << endl<< (float)(acceptance_muon)/(float)(events) << " = Acceptance"<<endl;
+output->Write();
 }
