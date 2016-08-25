@@ -110,6 +110,7 @@ TLorentzVector v_M_3h_postSelection;
 int numbJets=0;
 int numLightJets=0;
 int numTauJets=0;
+int trashEvent=0;
 //cout << "Event Number: " << jentry << endl;
 //if(Jet_size>=3 && Jet_PT[0]>Jet_PT[1] && Jet_PT[1]>Jet_PT[2]){
 //cout << Jet_PT[0] << endl;
@@ -124,6 +125,9 @@ int numTauJets=0;
 				numbJets++;
 				
 				//cout << jentry << endl;
+					}
+			else if (numbJets==1 && Jet_BTag[i]==1){
+				trashEvent=1;
 					}
 			else if(numLightJets==0 && Jet_BTag[i]==0 && Jet_TauTag[i]==0){	
 				v_j1.SetPtEtaPhiM(Jet_PT[i],Jet_Eta[i],Jet_Phi[i],Jet_Mass[i]);
@@ -150,8 +154,10 @@ int numTauJets=0;
                         	numTauJets++;
                                         }		
 		}//end of Jet Loop
+		if(trashEvent==1){continue;}	
+	
 		//cout << "Jet PT's " << v_j1.Pt()<<" "<<v_j2.Pt()<<" "<<v_j3.Pt() <<endl;
-		
+		/*
 		double  delta_eta_b12 = fabs(v_bJet.Eta()-v_j1.Eta())+fabs(v_bJet.Eta()-v_j2.Eta());
 		double  delta_eta_b13 = fabs(v_bJet.Eta()-v_j1.Eta())+fabs(v_bJet.Eta()-v_j3.Eta());
 		double  delta_eta_b23 = fabs(v_bJet.Eta()-v_j2.Eta())+fabs(v_bJet.Eta()-v_j3.Eta());
@@ -159,8 +165,8 @@ int numTauJets=0;
 		double dRb1 = sqrt((v_bJet.Phi()-v_j1.Phi())*(v_bJet.Phi()-v_j1.Phi())+(v_bJet.Eta()-v_j1.Eta())*(v_bJet.Eta()-v_j1.Eta()));
 		double dRb2 = sqrt((v_bJet.Phi()-v_j2.Phi())*(v_bJet.Phi()-v_j2.Phi())+(v_bJet.Eta()-v_j2.Eta())*(v_bJet.Eta()-v_j2.Eta()));
 		double dRb3 = sqrt((v_bJet.Phi()-v_j3.Phi())*(v_bJet.Phi()-v_j3.Phi())+(v_bJet.Eta()-v_j3.Eta())*(v_bJet.Eta()-v_j3.Eta()));
-		//cout<<"debug!"<<endl;
-		//int etaFill=0;
+		cout<<"debug!"<<endl;
+		int etaFill=0;
 		if(dRb1 < dRb3 && dRb2 < dRb3){
 			v_M_eta=v_bJet+v_j1+v_j2;
 			M_12_col->Fill((v_j2+v_j2).M());
@@ -180,7 +186,7 @@ int numTauJets=0;
 			//etaFill++;
                 }
 
-
+*/
 		v_M_b12 = v_bJet+v_j1+v_j2;
 		v_M_b13 = v_bJet+v_j1+v_j3;
 		v_M_b23 = v_bJet+v_j2+v_j3;
@@ -412,7 +418,7 @@ higgs_muon->Fill(v_higgs.M());
 }
 //------------------------------------------------------------------------
 //The below is for e+mu opposite sign
-if(v_electron.Pt()>2 && MissingET_MET[0]>2 && v_muon.Pt()>2){
+if(v_electron.Pt()>2 && MissingET_MET[0]>2 && v_muon.Pt()>2 && Muon_size==1 && Electron_size==1){
 v_missing.SetPtEtaPhiM(MissingET_MET[0],0,MissingET_Phi[0],0);
 double theta_e=TMath::ASin(v_electron.Py()/v_electron.Pt());
 double theta_mu=TMath::ASin(v_muon.Py()/v_muon.Pt());
@@ -454,54 +460,54 @@ cout << jentry << " events completed" <<endl;
 
   }//Event Loop
 
-Jet1_Pt->Scale(xs/Jet1_Pt->GetEntries());
-Jet2_Pt->Scale(xs/Jet2_Pt->GetEntries());
-Jet3_Pt->Scale(xs/Jet3_Pt->GetEntries());
-Jet4_Pt->Scale(xs/Jet4_Pt->GetEntries());
-leading_electron->Scale(xs/leading_electron->GetEntries());
-leading_muon->Scale(xs/leading_muon->GetEntries());
-missingET->Scale(xs/missingET->GetEntries());
-M_12_postSelection->Scale(xs/M_12_postSelection->GetEntries());
-M_b12_postSelection->Scale(xs/M_b12_postSelection->GetEntries());
-M_3emu_postSelection->Scale(xs/M_3emu_postSelection->GetEntries());
-M_12_col->Scale(xs/M_12_col->GetEntries());
+Jet1_Pt->Scale(xs/events);
+Jet2_Pt->Scale(xs/events);
+Jet3_Pt->Scale(xs/events);
+Jet4_Pt->Scale(xs/events);
+leading_electron->Scale(xs/events);
+leading_muon->Scale(xs/events);
+missingET->Scale(xs/events);
+M_12_postSelection->Scale(xs/events);
+M_b12_postSelection->Scale(xs/events);
+M_3emu_postSelection->Scale(xs/events);
+//M_12_col->Scale(xs/M_12_col->GetEntries());
 
 TFile* output = new TFile("Analysis_histograms_ver4.root","RECREATE");
 output->cd();
 //TCanvas* c1 = new TCanvas("c1","c1",800,800);
 //leading_lepton->Draw("e");
-M_b12->Scale(xs/M_b12->GetEntries());
+M_b12->Scale(xs/events);
 M_b12->Write("M_b12");
 
 //TCanvas* c2 = new TCanvas("c2","c2",800,800);
-M_b13->Scale(xs/M_b13->GetEntries());
+M_b13->Scale(xs/events);
 M_b13->Write("M_b13");
 //TCanvas* c3 = new TCanvas("c3","c3",800,800);
 //tau_hadron_PT->Draw("e");
-M_b23->Scale(xs/M_b23->GetEntries());
+M_b23->Scale(xs/events);
 M_b23->Write("M_b23");
 //TCanvas* ce = new TCanvas("ce","ce",800,800);
-M_eta->Scale(xs/M_eta->GetEntries());
-M_eta->Write("M_eta");
-M_12_col->Write("M_12_col");
+//M_eta->Scale(xs/M_eta->GetEntries());
+//M_eta->Write("M_eta");
+//M_12_col->Write("M_12_col");
 M_12_postSelection->Write("M_12_postSelection");
 M_b12_postSelection->Write("M_b12_postSelection");
 M_3emu_postSelection->Write("M_3emu_postSelection");
 
 //TCanvas* c4 = new TCanvas("c4","c4",800,800);
-higgs->Scale(xs/higgs->GetEntries());
+higgs->Scale(xs/events);
 higgs->Write("higgs_from_l/h");
 //TCanvas* c5 = new TCanvas("c5","c5",800,800);
-higgs_leptonic->Scale(xs/higgs_leptonic->GetEntries());
+higgs_leptonic->Scale(xs/events);
 higgs_leptonic->Write("higgs_leptonic");
 //TCanvas* c6 = new TCanvas("c6","c6",800,800);
-higgs_hadronic->Scale(xs/higgs_hadronic->GetEntries());
+higgs_hadronic->Scale(xs/events);
 higgs_hadronic->Write("higgs_hadronic");
 //TCanvas* c7 = new TCanvas("c7","c7",800,800);
-higgs_electron->Scale(xs/higgs_electron->GetEntries());
+higgs_electron->Scale(xs/events);
 higgs_electron->Write("higgs_electron");
 //TCanvas* c8 = new TCanvas("c8","c8",800,800);
-higgs_muon->Scale(xs/higgs_muon->GetEntries());
+higgs_muon->Scale(xs/events);
 higgs_muon->Write("higgs_muonic");
 Jet1_Pt->Write("Jet1 Pt");
 Jet2_Pt->Write("Jet2 Pt");
