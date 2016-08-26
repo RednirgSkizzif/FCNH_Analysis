@@ -31,7 +31,7 @@ int bins = h1->GetSize();
 double x=0;
 for (int i = 1;i<bins-1;i++){
 x=binWidth+x;
-myfile<<setw(12)<< x-binWidth/2<<"                    " << h1->GetBinContent(i)<< endl;
+myfile<<setw(12)<< x-binWidth/2<<"                    " << h1->GetBinContent(i)/binWidth<< endl;
 }
 
 myfile <<endl<< " bins are " << h1->GetXaxis()->GetBinWidth(1) << " GeV wide "<<endl;
