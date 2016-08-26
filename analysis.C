@@ -58,6 +58,7 @@ TH1D* M_12_postSelection = new TH1D("M_12_postSelection","Invariant Mass of j1+j
 TH1D* M_b12_postSelection = new TH1D("M_b12_postSelection","Invariant Mass of b+j1+j2",60,0,300);
 TH1D* M_3emu_postSelection = new TH1D("M_3h_postSelection","Invariant Mass of j3+tau+tau",60,0,300);
 TH1D* M_12_col = new TH1D("M_12_col","Invariant mass of jets near b jet",60,0,300);
+TH1D* bJet_Pt = new TH1D("bJet_Pt","bJet Pt",60,0,300);
 
 int acceptance_hadronic=0;
 int acceptance_lep=0;
@@ -123,6 +124,7 @@ int trashEvent=0;
 			if( numbJets==0 && Jet_BTag[i]==1){
 				v_bJet.SetPtEtaPhiM(Jet_PT[i],Jet_Eta[i],Jet_Phi[i],Jet_Mass[i]);	
 				numbJets++;
+				bJet_Pt->Fill(Jet_PT[i]);
 				
 				//cout << jentry << endl;
 					}
@@ -462,6 +464,7 @@ Jet1_Pt->Sumw2();
 Jet2_Pt->Sumw2();
 Jet3_Pt->Sumw2();
 Jet4_Pt->Sumw2();
+bJet_Pt->Sumw2();
 leading_electron->Sumw2();
 leading_muon->Sumw2();
 missingET->Sumw2();
@@ -478,6 +481,7 @@ higgs_electron->Sumw2();
 higgs_muon->Sumw2();
 
 
+bJet_Pt->Scale(xs/ecents);
 Jet1_Pt->Scale(xs/events);
 Jet2_Pt->Scale(xs/events);
 Jet3_Pt->Scale(xs/events);
@@ -531,6 +535,7 @@ Jet1_Pt->Write("Jet1 Pt");
 Jet2_Pt->Write("Jet2 Pt");
 Jet3_Pt->Write("Jet3 Pt");
 Jet4_Pt->Write("Jet4 Pt");
+bJet_Pt->Write("bJet Pt");
 leading_electron->Write("Leading Electron Pt");
 leading_muon->Write("Leading Muon Pt");
 missingET->Write("Missing Et");
