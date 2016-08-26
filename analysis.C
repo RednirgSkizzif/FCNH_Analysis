@@ -33,31 +33,31 @@ void analysis::Loop()
 
    Long64_t nentries = fChain->GetEntriesFast();
 double xs = 15.618;
-TH1D* top_hadronic = new TH1D("top_from_jets","Top Quark from Jets Mass",50,0,300);
-TH1D* w_from_jets = new TH1D("w_from_jets","W Boson from Jets Mass",50,0,200); 
-TH1D* higgs = new TH1D("higgs","Higgs lep/had invariant mass",50,0,250);
-TH1D* electrons = new TH1D("electrons","Leading electrons",30,0,200);
-TH1D* leading_electron = new TH1D("leading_electron","Leading electron",30,0,200);
-TH1D* leading_muon = new TH1D("leading_muon","leading muon",30,0,200);
-TH1D* missingET = new TH1D("misingET","Missing Energy",30,0,200);
-TH1D* M_b12 = new TH1D("M_b12","Invariant Mass of b+1+2 Jets",45,0,300); 
-TH1D* M_b13 = new TH1D("M_b13","Invariant Mass of b+1+3 Jets",45,0,300); 
-TH1D* M_b23 = new TH1D("M_23","Invariant Mass of b+2+3 Jets",45,0,300); 
-TH1D* M_eta = new TH1D("M_eta","Invariant Mass of smallest eta",45,0,300);
-TH1D* leading_lepton = new TH1D("leading_lepton","Leading Lepton PT",35,0,300);
-TH1D* tau_hadron_PT = new TH1D("tau_hadron_PT","Hadron from tau Pt",30,0,300);
-TH1D* higgs_leptonic = new TH1D("higgs_leptonic","Higgs invariant mass from e+mu opposite sign",30,0,300);
-TH1D* higgs_hadronic = new TH1D("higgs_hadronic","Higgs mass from 2 hadronic taus",30,0,300);
-TH1D* higgs_electron = new TH1D("higgs_electron","Higgs mass form 2 electrons",30,0,300);
-TH1D* higgs_muon = new TH1D("higgs_muon","Higgs from 2 muons",30,0,300);
-TH1D* Jet1_Pt = new TH1D("Jet1_Pt","Jet1 Pt",35,0,300);
-TH1D* Jet2_Pt = new TH1D("Jet2_Pt","Jet2 Pt",35,0,300);
-TH1D* Jet3_Pt = new TH1D("Jet3_Pt","Jet3 Pt",35,0,300);
-TH1D* Jet4_Pt = new TH1D("Jet4_Pt","Jet4 Pt",35,0,300);
-TH1D* M_12_postSelection = new TH1D("M_12_postSelection","Invariant Mass of j1+j2",45,0,300);
-TH1D* M_b12_postSelection = new TH1D("M_b12_postSelection","Invariant Mass of b+j1+j2",45,0,300);
-TH1D* M_3emu_postSelection = new TH1D("M_3h_postSelection","Invariant Mass of j3+tau+tau",45,0,300);
-TH1D* M_12_col = new TH1D("M_12_col","Invariant mass of jets near b jet",45,0,300);
+TH1D* top_hadronic = new TH1D("top_from_jets","Top Quark from Jets Mass",60,0,300);
+TH1D* w_from_jets = new TH1D("w_from_jets","W Boson from Jets Mass",60,0,200); 
+TH1D* higgs = new TH1D("higgs","Higgs lep/had invariant mass",100,0,250);
+TH1D* electrons = new TH1D("electrons","Leading electrons",60,0,200);
+TH1D* leading_electron = new TH1D("leading_electron","Leading electron",750,0,200);
+TH1D* leading_muon = new TH1D("leading_muon","leading muon",60,0,200);
+TH1D* missingET = new TH1D("misingET","Missing Energy",60,0,200);
+TH1D* M_b12 = new TH1D("M_b12","Invariant Mass of b+1+2 Jets",60,0,300); 
+TH1D* M_b13 = new TH1D("M_b13","Invariant Mass of b+1+3 Jets",60,0,300); 
+TH1D* M_b23 = new TH1D("M_23","Invariant Mass of b+2+3 Jets",60,0,300); 
+TH1D* M_eta = new TH1D("M_eta","Invariant Mass of smallest eta",60,0,300);
+TH1D* leading_lepton = new TH1D("leading_lepton","Leading Lepton PT",60,0,300);
+TH1D* tau_hadron_PT = new TH1D("tau_hadron_PT","Hadron from tau Pt",60,0,300);
+TH1D* higgs_leptonic = new TH1D("higgs_leptonic","Higgs invariant mass from e+mu opposite sign",60,0,300);
+TH1D* higgs_hadronic = new TH1D("higgs_hadronic","Higgs mass from 2 hadronic taus",60,0,300);
+TH1D* higgs_electron = new TH1D("higgs_electron","Higgs mass form 2 electrons",60,0,300);
+TH1D* higgs_muon = new TH1D("higgs_muon","Higgs from 2 muons",60,0,300);
+TH1D* Jet1_Pt = new TH1D("Jet1_Pt","Jet1 Pt",60,0,300);
+TH1D* Jet2_Pt = new TH1D("Jet2_Pt","Jet2 Pt",60,0,300);
+TH1D* Jet3_Pt = new TH1D("Jet3_Pt","Jet3 Pt",60,0,300);
+TH1D* Jet4_Pt = new TH1D("Jet4_Pt","Jet4 Pt",60,0,300);
+TH1D* M_12_postSelection = new TH1D("M_12_postSelection","Invariant Mass of j1+j2",60,0,300);
+TH1D* M_b12_postSelection = new TH1D("M_b12_postSelection","Invariant Mass of b+j1+j2",60,0,300);
+TH1D* M_3emu_postSelection = new TH1D("M_3h_postSelection","Invariant Mass of j3+tau+tau",60,0,300);
+TH1D* M_12_col = new TH1D("M_12_col","Invariant mass of jets near b jet",60,0,300);
 
 int acceptance_hadronic=0;
 int acceptance_lep=0;
@@ -154,7 +154,7 @@ int trashEvent=0;
                         	numTauJets++;
                                         }		
 		}//end of Jet Loop
-		if(trashEvent==1){continue;}	
+		//if(trashEvent==1){continue;}	
 	
 		//cout << "Jet PT's " << v_j1.Pt()<<" "<<v_j2.Pt()<<" "<<v_j3.Pt() <<endl;
 		/*
@@ -450,8 +450,7 @@ acceptance_lep++;
 //Ends the Compuations
 //
       events++;
-//if (jentry>5000)
-//break;
+//if (jentry>10000){break;}
 if(jentry % 100 == 0 )
 cout << jentry << " events completed" <<endl;
 
@@ -459,6 +458,25 @@ cout << jentry << " events completed" <<endl;
 
 
   }//Event Loop
+Jet1_Pt->Sumw2();
+Jet2_Pt->Sumw2();
+Jet3_Pt->Sumw2();
+Jet4_Pt->Sumw2();
+leading_electron->Sumw2();
+leading_muon->Sumw2();
+missingET->Sumw2();
+M_12_postSelection->Sumw2();
+M_b12_postSelection->Sumw2();
+M_3emu_postSelection->Sumw2();
+M_b12->Sumw2();
+M_b13->Sumw2();
+M_b23->Sumw2();
+higgs->Sumw2();
+higgs_leptonic->Sumw2();
+higgs_hadronic->Sumw2();
+higgs_electron->Sumw2();
+higgs_muon->Sumw2();
+
 
 Jet1_Pt->Scale(xs/events);
 Jet2_Pt->Scale(xs/events);
@@ -472,7 +490,7 @@ M_b12_postSelection->Scale(xs/events);
 M_3emu_postSelection->Scale(xs/events);
 //M_12_col->Scale(xs/M_12_col->GetEntries());
 
-TFile* output = new TFile("AnyFile.root","RECREATE");
+TFile* output = new TFile("tch.root","RECREATE");
 output->cd();
 //TCanvas* c1 = new TCanvas("c1","c1",800,800);
 //leading_lepton->Draw("e");
