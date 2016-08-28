@@ -32,7 +32,7 @@ void analysis::Loop()
    if (fChain == 0) return;
 
    Long64_t nentries = fChain->GetEntriesFast();
-double xs = 15.618;
+double xs = 26.4032;
 TH1D* top_hadronic = new TH1D("top_from_jets","Top Quark from Jets Mass",60,0,300);
 TH1D* w_from_jets = new TH1D("w_from_jets","W Boson from Jets Mass",60,0,200); 
 TH1D* higgs = new TH1D("higgs","Higgs lep/had invariant mass",100,0,250);

@@ -15,6 +15,7 @@ file->ls();
 while(1){
 ofstream myfile;
 string output;
+double sum=0;
 
 cout <<" What is the name of the histogram to extract column data from?"<<endl;
 cin.ignore(1000,'\n');
@@ -32,9 +33,12 @@ double x=0;
 for (int i = 1;i<bins-1;i++){
 x=binWidth+x;
 myfile<<setw(12)<< x-binWidth/2<<"                    " << h1->GetBinContent(i)/binWidth<< endl;
+sum = sum + h1->GetBinContent(i)/binWidth;
 }
 
-myfile <<endl<< " bins are " << h1->GetXaxis()->GetBinWidth(1) << " GeV wide "<<endl;
+myfile <<endl<< "The total Integral of the plot is : " << h1->Integral()<<endl;
+myfile << "The sum method of Integration gives : " << sum <<endl;
+myfile << " bins are " << h1->GetXaxis()->GetBinWidth(1) << " GeV wide "<<endl;
 int entries =  h1->GetEntries();
 myfile << " Number of entries = " << entries<< endl;
 myfile << " Number of bins = " << bins-2<<endl;
